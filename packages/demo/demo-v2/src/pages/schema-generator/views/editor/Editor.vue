@@ -224,6 +224,7 @@ export default {
         this.$on('onSetCurEditorItem', ({ editorItem }) => {
             this.activeName = editorItem ? 'compConfig' : 'formConfig';
             // 当选中某个表单时，更新可关联表单列表
+            // this.curEditorItem = editorItem;
             this.curEditorItem = updateRelationList(editorItem, this.componentList);
         });
     },

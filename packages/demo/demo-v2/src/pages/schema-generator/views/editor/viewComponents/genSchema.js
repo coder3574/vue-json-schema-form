@@ -16,7 +16,7 @@ function genBaseVal(type = 'string', isMultiSelect = false) {
                         title: '关联关系',
                         'ui:placeholder': '请选择需要关联的表单',
                         type: 'string',
-                        // default: '',
+                        default: '',
                         anyOfSelect: {
                         },
                         anyOf: [

@@ -71,29 +71,29 @@ function filterObj(obj, filter = (key, value) => (isObject(value) && !isEmptyObj
 
     return result;
 }
-function addRelatin2Schema(viewSchema, relation, componentList) {
-    // 给schema添加关联关系
-    return viewSchema;
-}
 // 更新可关联表单列表
 export function updateRelationList(editorItem, componentList) {
-    if (!editorItem) return {};
+    if (!editorItem) return null;
     console.log('更新可关联表单列表', editorItem, componentList);
-    const newList = componentList.map((item) => {
-        const { enum: enums, enumNames } = item.componentValue.options.schemaOptions;
-        return {
-            title: item.id,
-            type: 'string',
-            enum: enums,
-            enumNames
-        };
-    });
-    debugger;
+    const newList = [];
+    const len = componentList.length;
+    for (let i = 0; i < len; i += 1) {
+        const item = componentList[i];
+        if (item.id !== editorItem.id) {
+            const { enum: enums, enumNames } = item.componentValue.options.schemaOptions;
+            newList.push({
+                title: item.id,
+                type: 'string',
+                enum: enums.map(every => `${item.id}@${every}`),
+                enumNames
+            });
+        }
+    }
     const relationObj = editorItem.componentPack.propsSchema.properties.baseValue.properties.schemaOptions.properties.relation;
     relationObj.anyOf = newList;
     return editorItem;
 }
-export function editorItem2SchemaFieldProps(editorItem, formData, componentList = []) {
+export function editorItem2SchemaFieldProps(editorItem, formData) {
     // baseValue
     const {
         schemaOptions: baseSchemaOptions,
@@ -115,17 +115,8 @@ export function editorItem2SchemaFieldProps(editorItem, formData, componentList 
     } = editorItem.componentValue.rules || {};
 
     // schema
-    console.log('baseSchemaOptions', baseSchemaOptions);
-    // 如果存在关联关系
-    const relation = baseSchemaOptions.relation;
-    let viewSchema = JSON.parse(JSON.stringify(editorItem.componentPack.viewSchema));
-    if (relation) {
-        console.log('关联关系是', viewSchema, relation, componentList);
-        viewSchema = addRelatin2Schema(viewSchema, relation, componentList);
-    }
-
     const schema = {
-        ...viewSchema,
+        ...JSON.parse(JSON.stringify(editorItem.componentPack.viewSchema)),
         ...filterObj({
             ...baseSchemaOptions,
             ...schemaOptions,
@@ -226,7 +217,7 @@ export function componentList2JsonSchema(componentList) {
         if (item.$$parentFlag) {
             parentObj = item.$$parentFlag;
         } else {
-            const { schema, required, uiSchema } = editorItem2SchemaFieldProps(item, {}, componentList);
+            const { schema, required, uiSchema } = editorItem2SchemaFieldProps(item, {});
             const curSchema = {
                 ...schema,
                 ...uiSchema
@@ -249,6 +240,25 @@ export function componentList2JsonSchema(componentList) {
             }
         }
     }
-    console.log('baseObj', baseObj);
+    const relationBaseObj = addRelatin2Schema(baseObj);
+    return relationBaseObj;
+}
+
+function addRelatin2Schema(baseObj) {
+    // TODO 给schema添加关联关系
+    // 如果存在关联关系
+    console.log('给schema添加关联关系', baseObj);
+    const { properties } = baseObj;
+    // const newProperties = [];
+    for (const key in properties) {
+        console.log('key', key);
+        const cur = properties[key];
+        if (cur.relation) {
+            // 存在关联
+
+        } else {
+            // 不存在关联
+        }
+    }
     return baseObj;
 }
