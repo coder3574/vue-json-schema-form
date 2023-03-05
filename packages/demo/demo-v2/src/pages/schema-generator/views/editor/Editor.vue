@@ -154,10 +154,10 @@ import { deepFreeze } from './common/utils';
 import configTools from './config/tools';
 
 import NestedEditor from './components/NestedEditor';
-import { componentList2JsonSchema, formatFormLabelWidth } from './common/editorData';
+import { componentList2JsonSchema, formatFormLabelWidth, updateRelationList } from './common/editorData';
 import jsonSchema2ComponentList from './common/jsonSchema2ComponentList';
 
-deepFreeze(configTools);
+// deepFreeze(configTools); 暂时取消冻结
 
 export default {
     name: 'Editor',
@@ -223,7 +223,8 @@ export default {
     created() {
         this.$on('onSetCurEditorItem', ({ editorItem }) => {
             this.activeName = editorItem ? 'compConfig' : 'formConfig';
-            this.curEditorItem = editorItem;
+            // 当选中某个表单时，更新可关联表单列表
+            this.curEditorItem = updateRelationList(editorItem, this.componentList);
         });
     },
     methods: {

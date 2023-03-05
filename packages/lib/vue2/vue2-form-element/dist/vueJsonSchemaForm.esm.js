@@ -12326,9 +12326,68 @@ var UploadWidget = {
   }
 };
 
+//
+//
+//
+//
+var script$4 = {
+  name: 'TriggeRequestWidget',
+  props: {
+    btnText: {
+      type: String,
+      default: '点击上传'
+    }
+  },
+  methods: {}
+};
+
+/* script */
+var __vue_script__$4 = script$4;
+/* template */
+
+var __vue_render__$9 = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c("el-button", {
+    attrs: {
+      type: "primary"
+    }
+  }, [_vm._v(_vm._s(_vm.btnText))]);
+};
+
+var __vue_staticRenderFns__$9 = [];
+__vue_render__$9._withStripped = true;
+/* style */
+
+var __vue_inject_styles__$9 = undefined;
+/* scoped */
+
+var __vue_scope_id__$9 = undefined;
+/* module identifier */
+
+var __vue_module_identifier__$9 = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$9 = false;
+/* style inject */
+
+/* style inject SSR */
+
+/* style inject shadow dom */
+
+var __vue_component__$9 = /*#__PURE__*/normalizeComponent_1({
+  render: __vue_render__$9,
+  staticRenderFns: __vue_staticRenderFns__$9
+}, __vue_inject_styles__$9, __vue_script__$4, __vue_scope_id__$9, __vue_is_functional_template__$9, __vue_module_identifier__$9, false, undefined, undefined, undefined);
+
 /**
  * Created by Liu.Jun on 2020/5/17 10:41 下午.
  */
+console.log('TriggeRequestWidget'); // webpack -> rollup
 // const files = require.context('.', true, /\.js|vue$/);
 // const widgetComponents = files.keys().reduce((preVal, curKey) => {
 //     if (curKey !== './index.js') {
@@ -12344,7 +12403,8 @@ var widgetComponents = {
   TimePickerWidget: TimePickerWidget,
   DatePickerWidget: DatePickerWidget,
   DateTimePickerWidget: DateTimePickerWidget,
-  UploadWidget: UploadWidget
+  UploadWidget: UploadWidget,
+  TriggeRequestWidget: __vue_component__$9
 };
 
 /**

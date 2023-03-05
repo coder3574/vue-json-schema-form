@@ -44,6 +44,8 @@ import componentPackDateRangeString from '../viewComponents/DateRange/string';
 import componentPackDateTimeRange from '../viewComponents/DateTimeRange';
 import componentPackDateTimeRangeString from '../viewComponents/DateTimeRange/string';
 
+// 自定义组件
+import componenTriggeRequest from '../viewComponents/TriggeRequest';
 
 // 布局 Object Array
 import componentPackObject from '../viewComponents/Object';
@@ -157,6 +159,13 @@ const tools = [
         }, {
             title: 'Time(字符串)',
             componentPack: componentPackTime
+        }]
+    },
+    {
+        groupName: '自定义组件',
+        componentList: [{
+            title: '触发请求',
+            componentPack: componenTriggeRequest
         }]
     }
 ];

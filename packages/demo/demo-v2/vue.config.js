@@ -70,6 +70,7 @@ module.exports = {
     // webpack 链接 API，用于生成和修改 webpack 配置
     // https://github.com/mozilla-neutrino/webpack-chain
     chainWebpack: (config) => {
+        // config.resolve.symlinks(false);
         // 添加runtime
         config.optimization.runtimeChunk({
             name: 'user-runtime'

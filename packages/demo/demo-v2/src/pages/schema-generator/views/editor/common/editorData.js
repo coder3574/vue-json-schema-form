@@ -71,8 +71,29 @@ function filterObj(obj, filter = (key, value) => (isObject(value) && !isEmptyObj
 
     return result;
 }
-
-export function editorItem2SchemaFieldProps(editorItem, formData) {
+function addRelatin2Schema(viewSchema, relation, componentList) {
+    // 给schema添加关联关系
+    return viewSchema;
+}
+// 更新可关联表单列表
+export function updateRelationList(editorItem, componentList) {
+    if (!editorItem) return {};
+    console.log('更新可关联表单列表', editorItem, componentList);
+    const newList = componentList.map((item) => {
+        const { enum: enums, enumNames } = item.componentValue.options.schemaOptions;
+        return {
+            title: item.id,
+            type: 'string',
+            enum: enums,
+            enumNames
+        };
+    });
+    debugger;
+    const relationObj = editorItem.componentPack.propsSchema.properties.baseValue.properties.schemaOptions.properties.relation;
+    relationObj.anyOf = newList;
+    return editorItem;
+}
+export function editorItem2SchemaFieldProps(editorItem, formData, componentList = []) {
     // baseValue
     const {
         schemaOptions: baseSchemaOptions,
@@ -81,7 +102,6 @@ export function editorItem2SchemaFieldProps(editorItem, formData) {
             ...baseUiOptions
         } = {}
     } = editorItem.componentValue.baseValue;
-
     // options
     const {
         schemaOptions,
@@ -95,8 +115,17 @@ export function editorItem2SchemaFieldProps(editorItem, formData) {
     } = editorItem.componentValue.rules || {};
 
     // schema
+    console.log('baseSchemaOptions', baseSchemaOptions);
+    // 如果存在关联关系
+    const relation = baseSchemaOptions.relation;
+    let viewSchema = JSON.parse(JSON.stringify(editorItem.componentPack.viewSchema));
+    if (relation) {
+        console.log('关联关系是', viewSchema, relation, componentList);
+        viewSchema = addRelatin2Schema(viewSchema, relation, componentList);
+    }
+
     const schema = {
-        ...JSON.parse(JSON.stringify(editorItem.componentPack.viewSchema)),
+        ...viewSchema,
         ...filterObj({
             ...baseSchemaOptions,
             ...schemaOptions,
@@ -183,12 +212,11 @@ function genBaseObj() {
 
 export function componentList2JsonSchema(componentList) {
     const baseObj = genBaseObj();
-
+    console.log('componentList', componentList);
     let parentObj = baseObj;
     let queue = [{ $$parentFlag: parentObj }, ...componentList];
 
     const hasChild = data => Array.isArray(data.childList) && data.childList.length > 0;
-
     // 队列广度，同时标记父节点
     while (queue.length) {
         // 出队
@@ -198,7 +226,7 @@ export function componentList2JsonSchema(componentList) {
         if (item.$$parentFlag) {
             parentObj = item.$$parentFlag;
         } else {
-            const { schema, required, uiSchema } = editorItem2SchemaFieldProps(item, {});
+            const { schema, required, uiSchema } = editorItem2SchemaFieldProps(item, {}, componentList);
             const curSchema = {
                 ...schema,
                 ...uiSchema
@@ -221,6 +249,6 @@ export function componentList2JsonSchema(componentList) {
             }
         }
     }
-
+    console.log('baseObj', baseObj);
     return baseObj;
 }

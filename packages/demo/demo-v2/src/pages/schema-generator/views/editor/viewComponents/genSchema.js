@@ -12,6 +12,34 @@ function genBaseVal(type = 'string', isMultiSelect = false) {
             schemaOptions: {
                 type: 'object',
                 properties: {
+                    relation: {
+                        title: '关联关系',
+                        'ui:placeholder': '请选择需要关联的表单',
+                        type: 'string',
+                        // default: '',
+                        anyOfSelect: {
+                        },
+                        anyOf: [
+                            {
+                                title: '第一个',
+                                'ui:placeholder': '请选择选项',
+                                type: 'string',
+                                enum: [
+                                    '选项1',
+                                    '选项2'
+                                ],
+                            },
+                            {
+                                title: '第二个',
+                                type: 'string',
+                                enum: [
+                                    '选项2-1',
+                                    '选项2-2'
+                                ],
+                            }
+                        ],
+                        'err:required': '请输入标题'
+                    },
                     title: {
                         title: '标题',
                         type: 'string',
