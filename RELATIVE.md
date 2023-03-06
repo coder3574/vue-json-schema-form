@@ -1,6 +1,7 @@
 ### 开发关联表单
 1、参考问卷星的关联逻辑的交互设计
-2、代码层面，根据配置的关联修改schema结构！！！（核心功能）
+2、为了减小对schema结构的破坏，关联关系是通过ui:hidden配置表达式来实现。参考链接 https://vue-json-schema-form.lljj.me/zh/guide/data-linkage.html#ui-schema%E9%85%8D%E7%BD%AE%E8%A1%A8%E8%BE%BE%E5%BC%8F
+3、只能同层表单进行关联
 
 ### 问题
 1、yarn link时报错

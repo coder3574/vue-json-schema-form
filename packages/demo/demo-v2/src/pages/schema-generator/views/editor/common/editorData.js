@@ -71,22 +71,41 @@ function filterObj(obj, filter = (key, value) => (isObject(value) && !isEmptyObj
 
     return result;
 }
-// 更新可关联表单列表
+// 递归寻找当前表单所在层级的数组列表
+function findCurLevelComponentList(editorItem, componentList) {
+    for (let i = 0; i < componentList.length; i += 1) {
+        const item = componentList[i];
+        console.log('2', editorItem.id, item.id);
+        if (editorItem.id === item.id) {
+            // 找到当前层级
+            return componentList;
+        }
+        if (item.childList && item.childList.length > 0) {
+            return findCurLevelComponentList(editorItem, item.childList);
+        }
+    }
+    return '';
+}
+// 更新当前可关联表单列表
 export function updateRelationList(editorItem, componentList) {
     if (!editorItem) return null;
     console.log('更新可关联表单列表', editorItem, componentList);
     const newList = [];
-    const len = componentList.length;
+    const curLevelComponentList = findCurLevelComponentList(editorItem, componentList);
+    console.log('当前层级的关联表单列表', curLevelComponentList);
+    const len = curLevelComponentList.length;
     for (let i = 0; i < len; i += 1) {
-        const item = componentList[i];
+        const item = curLevelComponentList[i];
         if (item.id !== editorItem.id) {
-            const { enum: enums, enumNames } = item.componentValue.options.schemaOptions;
-            newList.push({
-                title: item.id,
-                type: 'string',
-                enum: enums.map(every => `${item.id}@${every}`),
-                enumNames
-            });
+            const { enum: enums, enumNames } = item.componentValue?.options?.schemaOptions || {};
+            if (enums) {
+                newList.push({
+                    title: item.id,
+                    type: 'string',
+                    enum: enums.map(every => `${item.id}@${every}`),
+                    enumNames
+                });
+            }
         }
     }
     const relationObj = editorItem.componentPack.propsSchema.properties.baseValue.properties.schemaOptions.properties.relation;
@@ -240,25 +259,38 @@ export function componentList2JsonSchema(componentList) {
             }
         }
     }
-    const relationBaseObj = addRelatin2Schema(baseObj);
-    return relationBaseObj;
+    addRelatin2Schema(baseObj);
+    return baseObj;
 }
-
+// 给schema添加关联关系
 function addRelatin2Schema(baseObj) {
-    // TODO 给schema添加关联关系
-    // 如果存在关联关系
     console.log('给schema添加关联关系', baseObj);
     const { properties } = baseObj;
-    // const newProperties = [];
+    if (!properties) return;
     for (const key in properties) {
         console.log('key', key);
         const cur = properties[key];
         if (cur.relation) {
             // 存在关联
-
-        } else {
-            // 不存在关联
+            const res = cur.relation.split('@');
+            const targetId = res[0];
+            const idx = res[1];
+            console.log('arr', targetId, idx);
+            const parentRelation = getParentRelation(targetId, properties);
+            cur['ui:hidden'] = `{{parentFormData.${targetId}!=='${idx}'${parentRelation ? `||${parentRelation}` : ''}}}`;
+            console.log('properties', properties);
+        }
+        if (cur.properties) {
+            // 有子集
+            addRelatin2Schema(cur);
         }
     }
-    return baseObj;
+}
+function getParentRelation(id, properties) {
+    if (!id || !properties[id] || !properties[id].relation) return null;
+    const cur = properties[id];
+    const res = cur.relation.split('@');
+    const targetId = res[0];
+    const idx = res[1];
+    return `parentFormData.${targetId}!=='${idx}'`;
 }
