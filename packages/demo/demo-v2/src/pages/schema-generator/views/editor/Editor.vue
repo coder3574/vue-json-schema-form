@@ -149,7 +149,7 @@ import ExportSchemaView from './components/ExportSchemaView.vue';
 import ImportSchemaView from './components/ImportSchemaView.vue';
 
 
-import { deepFreeze } from './common/utils';
+// import { deepFreeze } from './common/utils'; 暂时取消冻结
 
 import configTools from './config/tools';
 

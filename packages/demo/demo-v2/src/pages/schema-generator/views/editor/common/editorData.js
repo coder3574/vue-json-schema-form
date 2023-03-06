@@ -75,7 +75,6 @@ function filterObj(obj, filter = (key, value) => (isObject(value) && !isEmptyObj
 function findCurLevelComponentList(editorItem, componentList) {
     for (let i = 0; i < componentList.length; i += 1) {
         const item = componentList[i];
-        console.log('2', editorItem.id, item.id);
         if (editorItem.id === item.id) {
             // 找到当前层级
             return componentList;

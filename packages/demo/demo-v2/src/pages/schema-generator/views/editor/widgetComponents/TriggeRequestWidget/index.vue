@@ -10,9 +10,6 @@ export default {
             type: String,
             default: '点击上传'
         }
-    },
-    methods: {
-
     }
 };
 </script>
