@@ -97,13 +97,15 @@ export function updateRelationList(editorItem, componentList) {
     for (let i = 0; i < len; i += 1) {
         const item = curLevelComponentList[i];
         if (item.id !== editorItem.id) {
-            const { enum: enums, enumNames } = item.componentValue?.options?.schemaOptions || {};
-            if (enums) {
+            const { enum: enums, enumNames, items = {} } = item.componentValue?.options?.schemaOptions || {};
+            const list = enums || items.enum;// 兼容数组格式
+            const names = enumNames || items.enumNames;// 兼容数组格式
+            if (list) {
                 newList.push({
                     title: item.id,
                     type: 'string',
-                    enum: enums.map(every => `${item.id}@${every}`),
-                    enumNames
+                    enum: list.map(every => `${item.id}@${every}`),
+                    enumNames: names
                 });
             }
         }
@@ -269,28 +271,37 @@ function addRelatin2Schema(baseObj) {
     if (!properties) return;
     for (const key in properties) {
         console.log('key', key);
-        const cur = properties[key];
-        if (cur.relation) {
+        const curObj = properties[key];
+        if (curObj.relation) {
             // 存在关联
-            const res = cur.relation.split('@');
-            const targetId = res[0];
-            const idx = res[1];
-            console.log('arr', targetId, idx);
-            const parentRelation = getParentRelation(targetId, properties);
-            cur['ui:hidden'] = `{{parentFormData.${targetId}!=='${idx}'${parentRelation ? `||${parentRelation}` : ''}}}`;
-            console.log('properties', properties);
+            curObj['ui:hidden'] = `{{${getUiHiddenMustache(key, properties)}}}`;
         }
-        if (cur.properties) {
+        if (curObj.properties) {
             // 有子集
-            addRelatin2Schema(cur);
+            addRelatin2Schema(curObj);
+        } else if (curObj.items) {
+            // 数组的话 多一层items
+            addRelatin2Schema(curObj.items);
         }
     }
 }
-function getParentRelation(id, properties) {
-    if (!id || !properties[id] || !properties[id].relation) return null;
-    const cur = properties[id];
-    const res = cur.relation.split('@');
-    const targetId = res[0];
-    const idx = res[1];
-    return `parentFormData.${targetId}!=='${idx}'`;
+// 获取父级UiHidden表达式
+function getUiHiddenMustache(id, properties) {
+    if (!id || !properties[id] || !properties[id].relation) return '';
+    const curObj = properties[id];
+    const [targetId, targetValue] = curObj.relation.split('@');
+    if (properties[targetId]) {
+        let res = '';
+        if (targetId.indexOf('array') >= 0) {
+            // 数组使用indexOf
+            res = `parentFormData.${targetId}.indexOf('${targetValue}')<0`;
+        } else {
+            // 普通字符串使用非等
+            res = `parentFormData.${targetId}!=='${targetValue}'`;
+        }
+        const parent = getUiHiddenMustache(targetId, properties);
+        res += parent ? `||${parent}` : '';
+        return res;
+    }
+    return '';
 }
